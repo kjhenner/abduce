@@ -1,11 +1,10 @@
 # Site settings
 title: abduce!
-email: kjhenner at the ubiquitous google mail service
+email: kjhenner@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
-    Reflections and projections of language (words) and ontology (things).
+    Reflections on language (words) and ontology (things).
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://abduce.net" # the base hostname & protocol for your site
-twitter_username: retroductions
 github_username:  kjhenner
 
 # Build settings
