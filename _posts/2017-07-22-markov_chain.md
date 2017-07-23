@@ -1,6 +1,7 @@
 ---
 layout: post
 title:  'generative poetics episode 2: markov chains'
+comments: true
 ---
 
 In the last episode, I discussed a very simple model of generative poetry:
@@ -135,18 +136,16 @@ end
 
 Here's an example of the output:
 
-~~~
-cuique is this of our esteem Yet I
-have by my wife a canary with you
-Brutus as it and loud trumpet Let it
-As he did I proceeded Or else imputation
-of cheer for the watery kingdom Which as
-it soon out than his son of moan
-What black for with the realm of mine
-own rede Laer A very lips Where Caesar
-O notable shame you Why beg of your
-own impatience hath lost the soldiers With pestilent
-~~~
+> cuique is this of our esteem Yet I  
+> have by my wife a canary with you  
+> Brutus as it and loud trumpet Let it  
+> As he did I proceeded Or else imputation  
+> of cheer for the watery kingdom Which as  
+> it soon out than his son of moan  
+> What black for with the realm of mine  
+> own rede Laer A very lips Where Caesar  
+> O notable shame you Why beg of your  
+> own impatience hath lost the soldiers With pestilent  
 
 Though the Shakespearian vocabulary adds a touch of interest, this hardly does
 better drawing words from a bag. Remember, the theory behind this model is that
@@ -207,35 +206,31 @@ def generate_lines(enumerator, line_ngram_length=4, n=2, lines=10, join_char=' '
 
 Here's a poem generated with this bigram Markov model:
 
-~~~
-commandment I will run mad So much she
-doteth on her Mortimer Exit Mort Fie cousin
-Percy how you cross my father and all
-That from my mutest conscience to my tongue
-may utter forth The forms of things unknown
-the poet here describes By nature prov d
-worth a welcome lord The Earl of Salisbury
-and Warwick We thank you lords My title
-s good that s gone made himself much
-sport out of him I gather he is
-~~~
+> commandment I will run mad So much she  
+> doteth on her Mortimer Exit Mort Fie cousin  
+> Percy how you cross my father and all  
+> That from my mutest conscience to my tongue  
+> may utter forth The forms of things unknown  
+> the poet here describes By nature prov d  
+> worth a welcome lord The Earl of Salisbury  
+> and Warwick We thank you lords My title  
+> s good that s gone made himself much  
+> sport out of him I gather he is  
 
 The output is still quite rough, but using some discretion in punctuation and
 capitalization, I find a degree of syntactical and semantic coherence that,
 though imperfect, is notable for such a simple model:
 
-~~~
-Commandment, I will run mad! So much she
-Doteth on her Mortimer, Exit Mort. Fie cousin
-Percy, how you cross my father and all
-That from my mutest conscience to my tongue
-May utter forth. The forms of things unknown,
-The poet here describes by nature prov'd.
-Worth a welcome, lord The Earl of Salisbury
-And Warwick, we thank you lords. My title's
-Good that's gone made himself much
-sport out of him I gather he is.
-~~~
+> Commandment, I will run mad! So much she  
+> Doteth on her Mortimer, Exit Mort. Fie cousin  
+> Percy, how you cross my father and all  
+> That from my mutest conscience to my tongue  
+> May utter forth. The forms of things unknown,  
+> The poet here describes by nature prov'd.  
+> Worth a welcome, lord The Earl of Salisbury  
+> And Warwick, we thank you lords. My title's  
+> Good that's gone made himself much  
+> sport out of him I gather he is.  
 
 Some of this modest success, however, is a little deceptive. The larger the
 ngrams are the fewer possible followers I'll find for each.  This can lead our
