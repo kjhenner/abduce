@@ -74,7 +74,7 @@ markov_model['creatures']
 => ["we", "broke", "of", "not", "Turn", "as", "heartily", "would", "Gods", "But", "vile", "sitting", "and", "else", "their", "works", "feed", "That", "get", "as", "yet", "as", "ours", "are", "kings", "that", "Against", "are", "as", "living", "Whose", "want", "Which", "on", "Of"]
 ~~~
 
-Using a the `sample` mehtod on this array picks out a word at random.  Because
+Using the `sample` method on this array picks out a word at random.  Because
 some words show up after 'creatures' in multiple places in Shakespeare's work,
 these words are listed multiple times in the array. This means that the list
 represents the relative frequencies of all words following 'creatures.' For
