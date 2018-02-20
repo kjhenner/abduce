@@ -1,106 +1,19 @@
-## Can a computer tell me what I want to cite?
-
-A better researcher rigorously defines a project's scope then diligently
-consumes the topic's key, then minor, works, spurns tangents with an icy heart.
-I, on the other hand, always seem to emerge from my reading tangled in
-promising citations like some sea monster in fish nets and strands of kelp.
-
-I've often fantasized about a tool that could help manage these. With a way to
-efficiently store and query references, maybe I could really live in the
-moment! Of course, there are entirely useful and mundane tools for this kind
-of thing already available. It's way more fun, though, to build something new.
-
-In this post and those to follow in the series, I'll talk about the background
-of some of my ideas on exploring citations, then go into the actual process
-of building out coding a system to experiment with these ideas. You can see the
-current state of the project on [GitHub](https://github.com/kjhenner/pubmed_data).
-Because the project is very much a work in progress, the code there may be
-different than what I include here.
-
-Around the time I was thinking about citation management, I discovered a paper
-called "A solution to Plato's problem: the Latent Semantic Analysis theory of
-acquisition, induction and representation of knowledge." (Landauer, T. K. and
-Dumais, S. T., 1997) The "Plato's Problem" referred to in the title has its own
-chain of citations. Plato's complaint is that the commonalities of human
-knowledge and cognition seem far greater than what could be logically derived
-from commonalities actual experience. This implies some inborn component these
-capacities. Noam Chomksy applies this idea to linguistics: the complexity of
-language a child acquires can't be fully explained by the child's actual
-linguistic experiences, hence Chomsky's (1991) inference of an inborn Universal
-Grammar.
-
-While the complexity of debates over Universal Grammar seems far greater than
-the actual evidence involved on either side—call this "Chomsky's
-Problem"—Landauer and Dumais's solution to this "mystery of excessive learning"
-caught my attention. What if there's no shortage of information for language
-learners? Maybe it's all there, and we're just not looking hard enough. Though
-looking at all the different contexts in which a word occurs may not provide a
-language learner with enough information to accurately infer its meaning, these
-contexts are not isolated.
-
-If you'll forgive a somewhat contrived example, Imagine a child learning
-English who happens to never observe cooccurrence of "dog" and "tree" that can
-hint at the semantic relationship between dogs and trees. If, however, this
-child is familiar with the propositions that "dogs bark," and the idiom of
-"barking up a wrong tree," he or she may use this second order connection to
-infer a possible relationship between dogs and trees: the former's
-potential to "bark up" the latter.
-
-This kind of indirect association is certainly less concrete than a direct one.
-One easily imagine a child acquiring a confusing jumble of ideas about
-concept of "barking up" and the relationship, if any, it implies between trees
-and dogs. As unclear as any particular indirect relationship may be, however,
-the nature of combinatorics means that the number of potential indirect
-associations is astronomical.
-
-The question, then, transforms from a poverty of stimulus to an embarrassment
-of riches. With so many possible associations, how is it possible to infer
-useful relationships? Landauer and Dumais's contribution is to present an
-actual model that demonstrates that such aren't just possible, but can be
-achieved with a few relatively simple matrix transformations in linear algebra,
-an approach called latent semantic analysis (LSA).
-
-So how is all this relevant to my initial thoughts on managing citations?
-Through the lens of latent semantic analysis, a citation is little different
-than any other word on the page. If I can infer valuable information about the
-meaning of a word through its tangle of indirect association, why not do the
-same for a citation? How is it that I could get a feeling that a paper was
-getting Latourian, for example, even before actually reading Latour? While part
-of this could be explained through direct cooccurrences of Latour's name or
-citations of his work with specific terminologies, surely some of it is also
-indirect. Though I've haven't, to this point, used a Latourian terminology of
-networks, a reader might easily make an indirect association through my
-discussion of "indirect associations."
-
-The cool thing about applyin this approach to citations is that, even setting
-aside the actual latent semantic analysis model itself, citations themselves
-are already a kind formalized second order association. By common association
-with a citation, the contexts in which the citation occur can all be drawn
-into association with one another as well as with the cited work. The contexts
-in which citations occur often include the author's concise statement of a
-topic covered in the cited work, or a conclusion drawn from it. They also
-tend to position the cited work in relation to other works in a similar domain
-and may contextualize or evaluate the work. In this way, citation contexts
-can encode key aspects of the work they cite in a way that may be more concise
-than what appears in the work itself, or may not even be present in that work.
-
-The wonderful thing about the LSA approach Landauer and Dumais propose is that
-it actually gives us a concrete way to try this kind of thing out. My plan,
-then, is to build data set of citations and the contexts in which they occur.
-From there, I can explore the structure of those citations and see what kind of
-information about the cited works they encode. Next, I can apply LSA and see if
-it offers any improvement in predicting citations over a model based purely on
-direct associations.
-
-This brings me to my "wouldn't it be cool" proposition. With sufficiently
-accurate predictions, could a trained model make useful suggestions about what
-citaions might be contextually relevant. What if I could build a bibliography
-of works I had read before beginning to write a paper, then generate a set of
-suggested citations from among those works as I write? What if I could also
-discover sources I had neglected to read, but which the model deemed to be
-particularly relevant to a given passage?
+---
+layout: post
+title:  'citation mining episode 2: sourcing and parsing'
+comments: true
+---
 
 ## Sourcing data
+
+In the last post on this project, I discussed some of my thoughts around
+analyzing the semantic content of citations by applying a latent semantic model
+to collections of article paragraphs that include a common reference. Here,
+I'll dig in to the actual process of getting started on an implementation.
+
+The code for this project can be found on
+[GitHub](https://github.com/kjhenner/pubmed_data), though it may change from
+the examples I've given here.
 
 In my initial stab at implementing this model, I wanted to use papers in
 cultural anthropology, or at least in the social sciences. I figured my
@@ -195,16 +108,16 @@ Python scripts directly or opening an interactive Python session to experiment
 and test code. For this to work, I needed to use the `-i` and `-t` flags to run
 interactively and allocate a pseudo tty.
 
-To make the development process simpler, I also pass in `--rm -v \`pwd\`:/app`
+To make the development process simpler, I also pass in ``--rm -v `pwd`:/app``
 to mount the directory where the command is run (my project directory) to the
 `/app` directory on the container, and use `-w /app` to set the current working
 directory on the container to that `/app` directory.
 
 ```
 docker run -it \
-	--rm -v `pwd`:/app \
-	-w /app \
-	pubmed_env bash
+  --rm -v `pwd`:/app \
+  -w /app \
+  pubmed_env bash
 ```
 
 Mounting this directory lets me edit code in my project directory on my laptop
@@ -309,55 +222,70 @@ The overall structure of the `parse_file` function looks like this:
 parse_file(path):
 
     # Intiialize data dict with headers
-		data = {
-				'refs': {},
-				'paragraphs': [],
-				'contribs': [],
-				'ext_contribs': [],
-				'journals': [],
-				'articles': [],
-				'ext_journals': [],
-				'ext_articles': []
-		}
+    data = {
+        'refs': {},
+        'paragraphs': [],
+        'contribs': [],
+        'ext_contribs': [],
+        'journals': [],
+        'articles': [],
+        'ext_journals': [],
+        'ext_articles': []
+    }
 
-		#Parse the XML and get the tree and root
-		tree = etree.parse(path)
-		root = tree.getroot()
+    #Parse the XML and get the tree and root
+    tree = etree.parse(path)
+    root = tree.getroot()
 
-		# /article
-		article = root.xpath('/article')[0]
+    # /article
+    article = root.xpath('/article')[0]
 
-		# /article/back
-		back = if_xpath(article, 'back')
-		if back:
-				for ref in back.xpath('ref-list/ref'):
-						[...]
+    # /article/back
+    back = if_xpath(article, 'back')
+    if back:
+        for ref in back.xpath('ref-list/ref'):
+            [...]
 
-		# /article/front
-		front = article.xpath('front')[0]
+    # /article/front
+    front = article.xpath('front')[0]
 
-		# /article/front/journal-meta
-		journal_meta = front.xpath('journal-meta')[0]
+    # /article/front/journal-meta
+    journal_meta = front.xpath('journal-meta')[0]
     [...]
 
-		# /article/front/article-meta
-		article_meta = front.xpath('article-meta')[0]
+    # /article/front/article-meta
+    article_meta = front.xpath('article-meta')[0]
     [...]
 
-		data['articles'].append({
+    data['articles'].append({
       [...]
-		})
+    })
 
-		# /article/front/article-meta/contrib-group
-		contrib_group = article_meta.xpath('contrib-group')[0]
-		contribs = contrib_group.xpath('contrib')
-		for contrib in contribs:
-				[...]
+    # /article/front/article-meta/contrib-group
+    contrib_group = article_meta.xpath('contrib-group')[0]
+    contribs = contrib_group.xpath('contrib')
+    for contrib in contribs:
+        [...]
 
-		# /articls/body
-		body = article.xpath('body')[0]
-		for paragraph in body.xpath('*//p')
-				[...]
+    # /articls/body
+    body = article.xpath('body')[0]
+    for paragraph in body.xpath('*//p')
+        [...]
 
-		return data
+    return data
 ```
+
+This seems to work well enough. I was able to parse several thousand articles
+in a minute or two, so at worst, I figured leaving the process running for a
+few hours would be sufficient to parse the whole archive.
+
+This brought me to the somewhat gnarlier problem: format inconsistencies among
+journal articles. While I still haven't fully resolved this issue, as some of
+the fields I need to use as unique IDs to identify documents simply don't exist
+in some of the articles! The pragmatic solution may be to simply exclude this
+data for the time being and return to it if and when my results are compelling
+enough to justify the effort.
+
+For the non-essential fields, I simply implemented 'safe' functions that would
+attempt one or more paths to a data field before giving in and returning an
+empty string.
